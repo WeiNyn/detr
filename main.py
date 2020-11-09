@@ -176,6 +176,16 @@ def main(args):
         else:
             checkpoint = torch.load(args.resume, map_location='cpu')
         model_without_ddp.load_state_dict(checkpoint['model'])
+        # print(checkpoint)
+    else:
+        model = torch.hub.load('facebookresearch/detr', 'detr_resnet50', pretrained=False, num_classes=8)
+        checkpoint = torch.hub.load_state_dict_from_url(
+                url='https://dl.fbaipublicfiles.com/detr/detr-r50-e632da11.pth',
+                map_location='cpu',
+                check_hash=True)
+        del checkpoint["model"]["class_embed.weight"]
+        del checkpoint["model"]["class_embed.bias"]
+        model.load_state_dict(checkpoint["model"], strict=False)
 
         # del checkpoint["model"]["class_embed.weight"]
         # del checkpoint["model"]["class_embed.bias"]
